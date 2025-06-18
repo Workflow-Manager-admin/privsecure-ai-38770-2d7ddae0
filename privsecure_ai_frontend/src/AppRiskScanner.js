@@ -4,7 +4,7 @@ import React from "react";
 function AppRiskScanner(props) {
   /** This is a placeholder for the AppRiskScanner feature widget. */
   return (
-    <div className="widget widget-placeholder">
+    <div className="widget widget-placeholder widget-entry">
       App Risk Scanner
     </div>
   );

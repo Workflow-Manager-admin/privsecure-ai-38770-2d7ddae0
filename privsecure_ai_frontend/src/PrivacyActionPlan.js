@@ -4,7 +4,7 @@ import React from "react";
 function PrivacyActionPlan(props) {
   /** This is a placeholder for the PrivacyActionPlan feature widget. */
   return (
-    <div className="widget widget-placeholder">
+    <div className="widget widget-placeholder widget-entry">
       Privacy Action Plan
     </div>
   );

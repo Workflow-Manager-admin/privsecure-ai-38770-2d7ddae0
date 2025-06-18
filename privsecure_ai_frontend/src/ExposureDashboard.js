@@ -4,7 +4,7 @@ import React from "react";
 function ExposureDashboard(props) {
   /** This is a placeholder for the ExposureDashboard feature widget. */
   return (
-    <div className="widget widget-placeholder">
+    <div className="widget widget-placeholder widget-entry">
       Exposure Dashboard
     </div>
   );

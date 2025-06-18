@@ -4,7 +4,7 @@ import React from "react";
 function SettingsReportsSection(props) {
   /** This is a placeholder for the SettingsReportsSection feature widget. */
   return (
-    <div className="widget widget-placeholder">
+    <div className="widget widget-placeholder widget-entry">
       Settings &amp; Reports Section
     </div>
   );

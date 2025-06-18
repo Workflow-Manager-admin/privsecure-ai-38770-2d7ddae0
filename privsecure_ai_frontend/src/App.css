@@ -43,6 +43,8 @@ body {
   padding: 0;
   position: relative;
   z-index: 10;
+  /* Sidebar animation */
+  transition: width 0.32s cubic-bezier(0.4,0.01,0.25,1), min-width 0.32s cubic-bezier(0.4,0.01,0.25,1), box-shadow 0.28s cubic-bezier(0.4,0.01,0.25,1);
 }
 
 .sidebar-logo {
@@ -100,7 +102,7 @@ body {
   .sidebar {
     width: var(--sidebar-collapsed-width);
     min-width: var(--sidebar-collapsed-width);
-    transition: width 0.2s;
+    transition: width 0.32s cubic-bezier(0.4,0.01,0.25,1), min-width 0.32s cubic-bezier(0.4,0.01,0.25,1), box-shadow 0.28s cubic-bezier(0.4,0.01,0.25,1), left 0.25s cubic-bezier(0.4,0.01,0.25,1);
     overflow-x: hidden;
   }
   .sidebar-logo, .sidebar-title {
@@ -189,6 +191,11 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  /* Animation setup for entry, hover/resize effects */
+  opacity: 0;
+  transform: translateY(24px) scale(0.97);
+  animation: widget-fadein 0.68s cubic-bezier(0.41,0.01,0.25,1) forwards;
+  transition: box-shadow 0.22s, transform 0.18s;
 }
 
 .widget-placeholder {
@@ -199,7 +206,47 @@ body {
   letter-spacing: 0.025em;
   opacity: 0.69;
   user-select: none;
+  transition: color 0.18s linear, opacity 0.33s, letter-spacing 0.19s;
 }
+
+/* Smooth hover effect on widgets */
+.widget:hover, .widget:focus {
+  box-shadow: 0 8px 32px 0 #0008, 0 2px 8px 0 #0002;
+  transform: scale(1.025) translateY(-2px);
+}
+
+@keyframes widget-fadein {
+  0% {
+    opacity: 0;
+    transform: translateY(38px) scale(0.91);
+    filter: blur(2px);
+  }
+  75% {
+    opacity: 0.82;
+    transform: translateY(-6px) scale(1.035);
+    filter: blur(0.7px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: none;
+  }
+}
+
+/* Animate widgets-grid column/row changes for smooth layout transitions */
+.widgets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  gap: var(--widget-gap);
+  width: 100%;
+  max-width: 1300px;
+  margin: 0 auto;
+  align-content: start;
+  transition: grid-template-columns 0.35s cubic-bezier(0.4,0.01,0.25,1), gap 0.25s;
+  /* Add grid-animation for mobile/desktop collapse */
+  will-change: grid-template-columns, gap;
+}
+
 
 @media (max-width: 700px) {
   .main-content {
@@ -242,7 +289,25 @@ body {
   top: 0; left: 0;
   width: 100vw; height: 100vh;
   z-index: 19;
+  opacity: 1;
+  transition: opacity 0.22s cubic-bezier(0.41,0.01,0.25,1);
+  animation: fadeinSidebarOverlay 0.22s;
 }
+
+@keyframes fadeinSidebarOverlay {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Sidebar hamburger subtle pop when entered */
+.sidebar-hamburger {
+  transition: color 0.19s, opacity 0.19s, transform 0.16s;
+}
+.sidebar-hamburger:active {
+  transform: scale(0.97);
+  opacity: 0.7;
+}
+
 
 /* Optional: Hide hamburger when sidebar open */
 @media (min-width: 901px) {

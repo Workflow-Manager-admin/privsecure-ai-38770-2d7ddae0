@@ -4,7 +4,7 @@ import React from "react";
 function DataDisintegrationScheduler(props) {
   /** This is a placeholder for the DataDisintegrationScheduler feature widget. */
   return (
-    <div className="widget widget-placeholder">
+    <div className="widget widget-placeholder widget-entry">
       Data Disintegration Scheduler
     </div>
   );

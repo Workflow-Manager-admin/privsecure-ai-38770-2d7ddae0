@@ -4,7 +4,7 @@ import React from "react";
 function PrivacyManifestoGenerator(props) {
   /** This is a placeholder for the PrivacyManifestoGenerator feature widget. */
   return (
-    <div className="widget widget-placeholder">
+    <div className="widget widget-placeholder widget-entry">
       Privacy Manifesto Generator
     </div>
   );

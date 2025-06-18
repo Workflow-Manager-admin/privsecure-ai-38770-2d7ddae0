@@ -4,7 +4,7 @@ import React from "react";
 function DarkWebLeakMonitor(props) {
   /** This is a placeholder for the DarkWebLeakMonitor feature widget. */
   return (
-    <div className="widget widget-placeholder">
+    <div className="widget widget-placeholder widget-entry">
       Dark Web Leak Monitor
     </div>
   );

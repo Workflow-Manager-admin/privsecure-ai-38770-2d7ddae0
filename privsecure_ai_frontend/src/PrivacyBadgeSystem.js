@@ -4,7 +4,7 @@ import React from "react";
 function PrivacyBadgeSystem(props) {
   /** This is a placeholder for the PrivacyBadgeSystem feature widget. */
   return (
-    <div className="widget widget-placeholder">
+    <div className="widget widget-placeholder widget-entry">
       Privacy Behavior Badge System
     </div>
   );
