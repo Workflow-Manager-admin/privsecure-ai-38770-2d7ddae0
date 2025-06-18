@@ -3,13 +3,11 @@ import "./App.css";
 import { useTheme } from "./ThemeContext";
 
 // PUBLIC_INTERFACE
-function Sidebar({ onNavigate }) {
+function Sidebar({ onNavigate, activePage }) {
   /**
    * Sidebar navigation component for PrivSecure AI.
-   * Uses ThemeContext for color values and readiness to support theme dynamic switching.
-   * Lists all modules, highlights the active section, enables smooth scroll,
-   * and supports collapsed/overlay style on small screens.
-   * Styled using primary/secondary theme colors.
+   * Now performs "page" navigation via state, not scroll.
+   * Highlights and switches based on parent-held navigation state.
    */
   const { colors } = useTheme();
   const [collapsed, setCollapsed] = useState(window.innerWidth <= 900);
@@ -42,52 +40,12 @@ function Sidebar({ onNavigate }) {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Handle navigation, smooth scroll and highlight
-  useEffect(() => {
-    const sections = navLinks.map(link => document.getElementById(link.id));
-    const handleLinkClick = (e) => {
-      if (e.target.hash && e.target.hash.startsWith("#")) {
-        const el = document.getElementById(e.target.hash.slice(1));
-        if (el) {
-          e.preventDefault();
-          el.scrollIntoView({ behavior: "smooth", block: "start" });
-          window.history.replaceState(null, '', e.target.hash);
-          setSidebarOpen(false);
-        }
-        if (onNavigate) onNavigate(e.target.hash.slice(1));
-      }
-    };
-    const sidebarLinks = document.querySelectorAll(".sidebar-nav a");
-    sidebarLinks.forEach(link =>
-      link.addEventListener("click", handleLinkClick)
-    );
-
-    const handleScroll = () => {
-      let current = navLinks[0].id;
-      const scrollPos = window.scrollY + 100;
-      for (const section of sections) {
-        if (section && section.offsetTop <= scrollPos) {
-          current = section.id;
-        }
-      }
-      sidebarLinks.forEach(link => {
-        if (link.getAttribute("href") === `#${current}`) {
-          link.classList.add("active");
-        } else {
-          link.classList.remove("active");
-        }
-      });
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-
-    return () => {
-      sidebarLinks.forEach(link =>
-        link.removeEventListener("click", handleLinkClick)
-      );
-      window.removeEventListener("scroll", handleScroll);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // Navigation: no scroll, only page switch via prop call.
+  const handleLinkClick = (e, id) => {
+    e.preventDefault();
+    if (onNavigate) onNavigate(id);
+    setSidebarOpen(false);
+  };
 
   // Overlay for small screens
   const overlayStyle = {
@@ -96,7 +54,7 @@ function Sidebar({ onNavigate }) {
     left: 0,
     width: "100vw",
     height: "100vh",
-    background: "rgba(20, 38, 85, 0.64)", // Could be made dynamic if desired
+    background: "rgba(20, 38, 85, 0.64)",
     zIndex: 19,
     cursor: "pointer"
   };
@@ -122,26 +80,28 @@ function Sidebar({ onNavigate }) {
             display: sidebarOpen ? "none" : "block"
           }}
         >
-          {/* Hamburger icon */}
-          <span style={{
-            display: "inline-block",
-            width: 26,
-            height: 3,
-            background: colors.primary,
-            borderRadius: 2,
-            position: "relative",
-            boxShadow: `0 8px ${colors.primary}, 0 16px ${colors.primary}`
-          }}></span>
+          <span
+            style={{
+              display: "inline-block",
+              width: 26,
+              height: 3,
+              background: colors.primary,
+              borderRadius: 2,
+              position: "relative",
+              boxShadow: `0 8px ${colors.primary}, 0 16px ${colors.primary}`
+            }}
+          ></span>
         </button>
       )}
 
-      {/* Overlay (when sidebar open on mobile) */}
-      {collapsed && sidebarOpen &&
+      {/* Overlay */}
+      {collapsed && sidebarOpen && (
         <div
           className="sidebar-overlay"
           onClick={() => setSidebarOpen(false)}
           style={overlayStyle}
-        />}
+        />
+      )}
 
       <aside
         className="sidebar"
@@ -173,7 +133,22 @@ function Sidebar({ onNavigate }) {
           <ul>
             {navLinks.map(link => (
               <li key={link.id}>
-                <a href={`#${link.id}`} aria-label={link.label}>
+                <a
+                  href={`#${link.id}`}
+                  aria-label={link.label}
+                  className={activePage === link.id ? "active" : ""}
+                  onClick={e => handleLinkClick(e, link.id)}
+                  tabIndex={0}
+                  style={
+                    activePage === link.id
+                      ? {
+                          color: colors.primary,
+                          background: "rgba(9, 229, 243, 0.09)",
+                          borderLeft: `3px solid ${colors.primary}`
+                        }
+                      : {}
+                  }
+                >
                   {link.label}
                 </a>
               </li>

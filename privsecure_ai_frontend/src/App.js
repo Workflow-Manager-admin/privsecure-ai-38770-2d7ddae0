@@ -16,47 +16,51 @@ import { ThemeProvider } from './ThemeContext';
 
 // PUBLIC_INTERFACE
 function App() {
-  // The Sidebar component now handles its own navigation/scroll logic.
+  // This state determines which module/page is shown in the main area.
+  const [activePage, setActivePage] = React.useState('dashboard');
+
+  // Map page IDs to their feature components.
+  const pageComponents = {
+    dashboard: <ExposureDashboard />,
+    "privacy-plan": <PrivacyActionPlan />,
+    "digital-twin": <DigitalTwinScanner />,
+    "app-risk": <AppRiskScanner />,
+    "dark-web": <DarkWebLeakMonitor />,
+    "graph-map": <SocialGraphRiskMap />,
+    scheduler: <DataDisintegrationScheduler />,
+    badges: <PrivacyBadgeSystem />,
+    manifesto: <PrivacyManifestoGenerator />,
+    settings: <SettingsReportsSection />
+  };
+
+  // Handler for sidebar navigation.
+  const handleNavigate = (page) => {
+    setActivePage(page);
+  };
+
   return (
     <ThemeProvider>
       <div className="app-shell">
-        <Sidebar />
+        <Sidebar onNavigate={handleNavigate} activePage={activePage} />
         <div className="main-layout">
           <header className="header">
             <div className="header-title">Welcome to PrivSecure AI</div>
           </header>
           <main className="main-content">
             <div className="widgets-grid">
-              <section id="dashboard" tabIndex={-1} style={{ scrollMarginTop: 72 }}>
-                <ExposureDashboard />
-              </section>
-              <section id="privacy-plan" tabIndex={-1} style={{ scrollMarginTop: 72 }}>
-                <PrivacyActionPlan />
-              </section>
-              <section id="digital-twin" tabIndex={-1} style={{ scrollMarginTop: 72 }}>
-                <DigitalTwinScanner />
-              </section>
-              <section id="app-risk" tabIndex={-1} style={{ scrollMarginTop: 72 }}>
-                <AppRiskScanner />
-              </section>
-              <section id="dark-web" tabIndex={-1} style={{ scrollMarginTop: 72 }}>
-                <DarkWebLeakMonitor />
-              </section>
-              <section id="graph-map" tabIndex={-1} style={{ scrollMarginTop: 72 }}>
-                <SocialGraphRiskMap />
-              </section>
-              <section id="scheduler" tabIndex={-1} style={{ scrollMarginTop: 72 }}>
-                <DataDisintegrationScheduler />
-              </section>
-              <section id="badges" tabIndex={-1} style={{ scrollMarginTop: 72 }}>
-                <PrivacyBadgeSystem />
-              </section>
-              <section id="manifesto" tabIndex={-1} style={{ scrollMarginTop: 72 }}>
-                <PrivacyManifestoGenerator />
-              </section>
-              <section id="settings" tabIndex={-1} style={{ scrollMarginTop: 72 }}>
-                <SettingsReportsSection />
-              </section>
+              {pageComponents[activePage] ? (
+                <section
+                  id={activePage}
+                  tabIndex={-1}
+                  style={{ scrollMarginTop: 72, width: "100%" }}
+                >
+                  {pageComponents[activePage]}
+                </section>
+              ) : (
+                <section>
+                  <div className="widget widget-placeholder">Feature not found.</div>
+                </section>
+              )}
             </div>
           </main>
         </div>
