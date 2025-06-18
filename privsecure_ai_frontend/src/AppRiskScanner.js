@@ -534,9 +534,14 @@ function AppRiskScanner() {
     }, 1050);
   }
 
-  // Handler for review (still stub)
+  // Handler for review -- opens Privacy Checkpoint modal
+  const [privacyModal, setPrivacyModal] = useState({ open: false, appName: null });
   function handleAction(action, appName) {
-    window.alert(`${action} action for "${appName}" – (This is mock UI)`);
+    if (action === "Review") {
+      setPrivacyModal({ open: true, appName });
+    } else {
+      window.alert(`${action} action for "${appName}" – (This is mock UI)`);
+    }
   }
 
   // Helper: Render Alternative Apps List
