@@ -216,3 +216,36 @@ body {
 }
 
 /* Remove legacy/hero/landing styles */
+
+/* Sidebar responsive hamburger & overlay styles */
+.sidebar-hamburger {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-size: 2rem;
+  position: fixed;
+  top: 18px;
+  left: 14px;
+  z-index: 30;
+  display: block;
+  padding: 0;
+  cursor: pointer;
+}
+
+.sidebar-hamburger:focus {
+  outline: 3px solid var(--secondary);
+}
+
+.sidebar-overlay {
+  background: rgba(20,38,85,0.63);
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  z-index: 19;
+}
+
+/* Optional: Hide hamburger when sidebar open */
+@media (min-width: 901px) {
+  .sidebar-hamburger { display: none !important; }
+}
+
