@@ -1,0 +1,218 @@
+:root {
+  --primary: #0ff;
+  --secondary: #ff9edb;
+  --accent: #0ff;
+  --base-dark: #00008b;
+  --base-sidebar: #184e77;
+  --text-color: #fff;
+  --text-secondary: rgba(255,255,255,0.7);
+  --border-color: rgba(255,255,255,0.1);
+
+  --sidebar-width: 220px;
+  --sidebar-collapsed-width: 60px;
+  --header-height: 64px;
+  --widget-gap: 24px;
+  --widget-radius: 16px;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+  background-color: var(--base-dark);
+  color: var(--text-color);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+}
+
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+  width: 100vw;
+  background: var(--base-dark);
+}
+
+.sidebar {
+  background: var(--base-sidebar);
+  width: var(--sidebar-width);
+  min-width: var(--sidebar-width);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  border-right: 1px solid var(--border-color);
+  padding: 0;
+  position: relative;
+  z-index: 10;
+}
+
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.4rem;
+  font-weight: 600;
+  padding: 32px 0 24px 32px;
+  color: var(--primary);
+  letter-spacing: 0.01em;
+  background: none;
+  user-select: none;
+}
+.sidebar-logo-symbol {
+  font-size: 1.6rem;
+  color: var(--accent);
+  filter: drop-shadow(0 0 2px var(--secondary));
+}
+.sidebar-title {
+  color: var(--primary);
+}
+
+.sidebar-nav {
+  margin-top: 8px;
+  flex: 1 1 auto;
+}
+.sidebar-nav ul {
+  list-style: none;
+  padding: 0 0 32px 0;
+  margin: 0;
+}
+.sidebar-nav li {
+  margin: 0;
+}
+.sidebar-nav a {
+  display: block;
+  color: var(--text-secondary);
+  text-decoration: none;
+  padding: 14px 32px;
+  font-size: 1.03rem;
+  font-weight: 500;
+  transition: background 0.15s, color 0.15s;
+  border-left: 3px solid transparent;
+}
+.sidebar-nav a.active,
+.sidebar-nav a:hover,
+.sidebar-nav a:focus {
+  color: var(--primary);
+  background: rgba(9, 229, 243, 0.09);
+  border-left: 3px solid var(--primary);
+}
+
+@media (max-width: 900px) {
+  .sidebar {
+    width: var(--sidebar-collapsed-width);
+    min-width: var(--sidebar-collapsed-width);
+    transition: width 0.2s;
+    overflow-x: hidden;
+  }
+  .sidebar-logo, .sidebar-title {
+    font-size: 0;
+    padding-left: 16px;
+  }
+  .sidebar-logo-symbol {
+    font-size: 1.3rem;
+  }
+  .sidebar-nav a {
+    font-size: 0;
+    padding: 14px 14px;
+  }
+  .sidebar-nav a::before {
+    content: '';
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background: var(--primary);
+    border-radius: 50%;
+    margin-right: 0;
+  }
+}
+
+/* ----- Main Area ----- */
+.main-layout {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--base-dark);
+}
+
+.header {
+  height: var(--header-height);
+  background: #091a36;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  padding: 0 2vw;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--primary);
+  letter-spacing: 0.01em;
+  z-index: 20;
+}
+
+@media (max-width: 600px) {
+  .header {
+    font-size: 1rem;
+    padding: 0 10px;
+    min-height: 50px;
+    height: 50px;
+  }
+}
+
+/* ----- Responsive Widgets Grid ----- */
+.main-content {
+  flex: 1 1 auto;
+  display: flex;
+  padding: 32px 2vw 32px 2vw;
+  min-height: 0;
+  box-sizing: border-box;
+  align-items: stretch;
+  background: linear-gradient(127deg, #0ff1 0%, #184e77 80%, #000c43 100%);
+}
+
+.widgets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  gap: var(--widget-gap);
+  width: 100%;
+  max-width: 1300px;
+  margin: 0 auto;
+  align-content: start;
+}
+
+.widget {
+  background: rgba(255,255,255,0.04);
+  border-radius: var(--widget-radius);
+  box-shadow: 0 2px 8px 0 #0002;
+  border: 1.5px solid var(--border-color);
+  padding: 32px 24px;
+  min-width: 0;
+  min-height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.widget-placeholder {
+  color: var(--secondary);
+  font-size: 1.25rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  opacity: 0.69;
+  user-select: none;
+}
+
+@media (max-width: 700px) {
+  .main-content {
+    padding: 12px 2vw;
+  }
+  .widgets-grid {
+    gap: 14px;
+  }
+  .widget {
+    padding: 16px 7px;
+    font-size: 1rem;
+    min-height: 92px;
+  }
+}
+
+/* Remove legacy/hero/landing styles */
