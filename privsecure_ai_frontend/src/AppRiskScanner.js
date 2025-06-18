@@ -227,8 +227,11 @@ function ConfirmDialog({
   );
 }
 
-// Toast/notification for "revoked" with undo
-function ToastNotification({ open, msg, undoLabel, onUndo, timeout = 4800 }) {
+/**
+ * Toast/notification for revoke/undo flow,
+ * supports rich msg content (React node), UNDO button, and auto-dismiss after timeout.
+ */
+function ToastNotification({ open, msg, undoLabel, onUndo, timeout = 10000 }) {
   const [visible, setVisible] = useState(open);
 
   React.useEffect(() => {
@@ -262,7 +265,9 @@ function ToastNotification({ open, msg, undoLabel, onUndo, timeout = 4800 }) {
       aria-live="assertive"
       tabIndex={-1}
     >
-      <span style={{ marginRight: 19 }}>{msg}</span>
+      <span style={{ marginRight: 19 }}>
+        {typeof msg === "string" ? msg : msg}
+      </span>
       {!!onUndo && (
         <button
           onClick={onUndo}
@@ -303,35 +308,38 @@ function AppRiskScanner() {
     undoable: false,
   });
 
-  // Handler: Enhanced action for "Revoke" with confirmation
+  // Handler: Enhanced action for "Revoke" with confirmation and permission summary
   function handleRevokeClick(app, idx) {
     setPendingRevokeApp({ ...app, idx });
     setDialogOpen(true);
   }
 
-  // Handler: Confirm user wants to revoke
+  // Handler: Confirm user wants to revoke (with simulated OAuth call, notification + UNDO)
   function handleRevokeConfirm() {
     if (!pendingRevokeApp) return;
     setIsRevoking(true);
-    // Simulate an API call to OAuth revoke endpoint (delay for realism)
+    // Simulate OAuth/API call to revoke (fake latency, as required)
     setTimeout(() => {
       setApps((apps) =>
         apps.map((app, i) =>
-          i === pendingRevokeApp.idx
-            ? { ...app, revoked: true }
-            : app
+          i === pendingRevokeApp.idx ? { ...app, revoked: true } : app
         )
       );
       setDialogOpen(false);
       setIsRevoking(false);
       setToast({
         open: true,
-        msg: `Access revoked for "${pendingRevokeApp.name}". Privacy risk reduced.`,
+        msg: (
+          <>
+            <span>Access revoked for &quot;{pendingRevokeApp.name}&quot;.</span>
+            <span style={{ marginLeft: 8, color: "#15ffe7", fontWeight: 600 }}>Privacy risk reduced.</span>
+          </>
+        ),
         appIdx: pendingRevokeApp.idx,
         undoable: true,
       });
       setPendingRevokeApp(null);
-    }, 940); // simulate network latency
+    }, 940);
   }
 
   // Handler: Undo revoke
@@ -570,7 +578,7 @@ function AppRiskScanner() {
         msg={toast.msg}
         undoLabel={toast.undoable ? "Undo" : undefined}
         onUndo={toast.undoable ? handleUndoRevoke : undefined}
-        timeout={4500}
+        timeout={10000}
       />
     </div>
   );
