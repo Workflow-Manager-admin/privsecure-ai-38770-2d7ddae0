@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
+import { useTheme } from "./ThemeContext";
 
 // PUBLIC_INTERFACE
 function Sidebar({ onNavigate }) {
   /**
    * Sidebar navigation component for PrivSecure AI.
+   * Uses ThemeContext for color values and readiness to support theme dynamic switching.
    * Lists all modules, highlights the active section, enables smooth scroll,
    * and supports collapsed/overlay style on small screens.
    * Styled using primary/secondary theme colors.
    */
+  const { colors } = useTheme();
   const [collapsed, setCollapsed] = useState(window.innerWidth <= 900);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -93,7 +96,7 @@ function Sidebar({ onNavigate }) {
     left: 0,
     width: "100vw",
     height: "100vh",
-    background: "rgba(20, 38, 85, 0.64)",
+    background: "rgba(20, 38, 85, 0.64)", // Could be made dynamic if desired
     zIndex: 19,
     cursor: "pointer"
   };
@@ -113,7 +116,7 @@ function Sidebar({ onNavigate }) {
             zIndex: 30,
             background: "none",
             border: "none",
-            color: "var(--primary)",
+            color: colors.primary,
             fontSize: "2rem",
             cursor: "pointer",
             display: sidebarOpen ? "none" : "block"
@@ -124,10 +127,10 @@ function Sidebar({ onNavigate }) {
             display: "inline-block",
             width: 26,
             height: 3,
-            background: "var(--primary)",
+            background: colors.primary,
             borderRadius: 2,
             position: "relative",
-            boxShadow: "0 8px var(--primary), 0 16px var(--primary)"
+            boxShadow: `0 8px ${colors.primary}, 0 16px ${colors.primary}`
           }}></span>
         </button>
       )}
