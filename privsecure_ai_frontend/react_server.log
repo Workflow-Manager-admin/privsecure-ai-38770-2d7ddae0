@@ -7,13 +7,13 @@
 <i> [webpack-dev-server] On Your Network (IPv4): http://172.17.0.2:3000/
 <i> [webpack-dev-server] Content not from webpack is served from './public' directory
 Injecting EditorRootWrapper import: ../.ve/EditorRootWrapper
-asset bundle.js 1.59 MiB [emitted] (name: main)
+asset bundle.js 1.61 MiB [emitted] (name: main)
 asset index.html 1.98 KiB [emitted]
 runtime modules 27.5 KiB 14 modules
-cacheable modules 1.42 MiB
+cacheable modules 1.43 MiB
   modules by path ./node_modules/ 1.24 MiB 31 modules
-  modules by path ./src/ 170 KiB
-    modules by path ./src/*.js 158 KiB 14 modules
+  modules by path ./src/ 185 KiB
+    modules by path ./src/*.js 172 KiB 14 modules
     modules by path ./src/*.css 12.5 KiB
       ./src/index.css 2.23 KiB [built] [code generated]
       + 3 modules
@@ -23,14 +23,14 @@ cacheable modules 1.42 MiB
       ./.ve/EditorOverlay.css 2.25 KiB [built] [code generated]
       ./node_modules/css-loader/dist/cjs.js!./.ve/EditorOverlay.css 697 bytes [built] [code generated]
     ./.ve/EditorOverlay.jsx 1.58 KiB [built] [code generated]
-webpack 5.99.9 compiled successfully in 1621 ms
+webpack 5.99.9 compiled successfully in 1693 ms
 assets by status 1.98 KiB [cached] 1 asset
-assets by path *.js 1.63 MiB
-  asset bundle.js 1.61 MiB [emitted] (name: main)
-  asset main.a9745fabb3067f789146.hot-update.js 19.4 KiB [emitted] [immutable] [hmr] (name: main)
-asset main.a9745fabb3067f789146.hot-update.json 28 bytes [emitted] [immutable] [hmr]
-Entrypoint main 1.63 MiB = bundle.js 1.61 MiB main.a9745fabb3067f789146.hot-update.js 19.4 KiB
-cached modules 1.42 MiB [cached] 53 modules
+assets by path *.js 1.65 MiB
+  asset bundle.js 1.63 MiB [emitted] (name: main)
+  asset main.77c2f5f1a66893d346ba.hot-update.js 21 KiB [emitted] [immutable] [hmr] (name: main)
+asset main.77c2f5f1a66893d346ba.hot-update.json 28 bytes [emitted] [immutable] [hmr]
+Entrypoint main 1.65 MiB = bundle.js 1.63 MiB main.77c2f5f1a66893d346ba.hot-update.js 21 KiB
+cached modules 1.43 MiB [cached] 53 modules
 runtime modules 27.5 KiB 14 modules
-./src/PrivacyBadgeSystem.js 15 KiB [built] [code generated]
-webpack 5.99.9 compiled successfully in 163 ms
+./src/PrivacyManifestoGenerator.js 16.3 KiB [built] [code generated]
+webpack 5.99.9 compiled successfully in 175 ms
