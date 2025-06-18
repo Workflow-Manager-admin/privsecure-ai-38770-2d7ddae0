@@ -127,7 +127,65 @@ function Sidebar({ onNavigate, activePage }) {
         aria-label="Sidebar navigation"
       >
         <div className="sidebar-logo">
-          <span className="sidebar-logo-symbol">*</span>
+          {/* Shield/Lock SVG Icon */}
+          <span className="sidebar-logo-symbol" aria-label="logo">
+            {/* SVG Shield+Lock */}
+            <svg
+              viewBox="0 0 28 28"
+              width="28"
+              height="28"
+              style={{
+                display: 'inline-block',
+                verticalAlign: 'middle',
+                marginRight: 4,
+                filter: 'drop-shadow(0 0 2px var(--secondary))',
+              }}
+              aria-hidden="true"
+              focusable="false"
+            >
+              <defs>
+                <linearGradient id="themeShield" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="var(--primary)" stopOpacity="0.87"/>
+                  <stop offset="85%" stopColor="var(--accent)" stopOpacity="0.44"/>
+                </linearGradient>
+              </defs>
+              <path
+                d="M14 3 L24 7.5 V13.8C24 20.1 14 25 14 25C14 25 4 20.1 4 13.8V7.5L14 3Z"
+                fill="url(#themeShield)"
+                stroke="var(--primary)"
+                strokeWidth="1.8"
+                opacity="0.92"
+              />
+              {/* Lock - body */}
+              <rect
+                x="9.7"
+                y="13.3"
+                width="8.6"
+                height="6"
+                rx="2.1"
+                fill="var(--base-sidebar)"
+                stroke="var(--secondary)"
+                strokeWidth="1"
+                opacity="0.89"
+              />
+              {/* Lock - shackle */}
+              <path
+                d="M11.9 15.4V14.6C11.9 13.1 13 12 14 12s2.1 1.1 2.1 2.6v0.8"
+                fill="none"
+                stroke="var(--secondary)"
+                strokeWidth="1.04"
+                opacity="0.92"
+              />
+              {/* Lock - keyhole */}
+              <circle
+                cx="14"
+                cy="17"
+                r="0.74"
+                fill="var(--primary)"
+                opacity="0.85"
+              />
+            </svg>
+          </span>
           <span className="sidebar-title">PrivSecure AI</span>
         </div>
         <nav className="sidebar-nav">
