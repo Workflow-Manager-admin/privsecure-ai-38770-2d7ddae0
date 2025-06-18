@@ -397,77 +397,200 @@ function DataDisintegrationScheduler() {
       className="widget"
       style={{
         minWidth: 0,
-        minHeight: 320,
+        minHeight: 365,
         width: "100%",
         background: "rgba(255,255,255,0.039)",
         border: "1.8px solid var(--border-color)",
         boxShadow: "0 0 0 0 transparent",
-        padding: "0",
+        padding: 0,
         display: "flex",
         flexDirection: "column",
+        position: "relative"
       }}
       tabIndex={0}
       aria-label="Data disintegration scheduler"
     >
+      {/* Title */}
       <div
         style={{
           fontWeight: 700,
-          fontSize: "1.17rem",
+          fontSize: "1.18rem",
           color: "var(--primary)",
           textShadow: "0px 2px 10px #0ff2",
           letterSpacing: ".018em",
-          padding: "23px 22px 5px 22px",
+          padding: "23px 24px 4px 24px"
         }}
       >
         Smart Scheduler: Data Disintegration & Redaction Timeline
       </div>
+      {/* Description */}
       <div
         style={{
           color: "var(--text-secondary)",
           fontSize: "1.01em",
           fontWeight: 500,
-          marginBottom: 5,
-          padding: "0 22px 6px 22px",
+          marginBottom: 6,
+          padding: "0 24px 8px 24px"
         }}
       >
-        Review upcoming deletions for emails, posts and files — preview timelines, suggest redactions, and set automated rules to reclaim your privacy.
+        Review upcoming deletions for emails, posts, and files—see timeline, redaction suggestions, and set automated rules to reclaim your privacy.
       </div>
-      <div style={{
-        display: "flex",
-        flexWrap: "wrap",
-        gap: 0,
-        width: "100%",
-        alignItems: "flex-start",
-        justifyContent: "space-between",
-        padding: "0 16px 0 16px"
-      }}>
-        {/* Controls panel (on left, stack above on mobile) */}
+      {/* MAIN RESPONSIVE LAYOUT */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "minmax(260px, 350px) 1fr",
+          gap: "36px",
+          width: "100%",
+          alignItems: "flex-start",
+          padding: "0 16px 0 16px",
+          margin: 0
+        }}
+      >
+        {/* Controls panel (left) */}
         <div style={{
-          minWidth: 275,
-          flex: "0 1 320px",
+          minWidth: 230,
+          width: "100%",
+          maxWidth: 420,
+          flex: "1 1 330px",
+          alignSelf: "stretch"
         }}>
           <RulesPanel rules={rules} onUpdate={handleRuleUpdate} />
         </div>
-        {/* Timeline + Table */}
-        <div style={{
-          flex: "2 1 370px",
-          minWidth: 240,
-          marginLeft: 19,
-        }}>
+        {/* Scheduler + Timeline + Redaction Suggestions (right) */}
+        <div
+          style={{
+            width: "100%",
+            minWidth: 250,
+            flex: "2 1 390px",
+            display: "flex",
+            flexDirection: "column",
+            gap: "26px",
+            alignItems: "stretch"
+          }}
+        >
+          {/* Timeline (top) */}
           <TimelineView items={MOCK_ITEMS} />
+          {/* Scheduler Table (middle) */}
           <SchedulerTable items={MOCK_ITEMS} />
+          {/* Redaction Suggestions (bottom section, below table) */}
+          <div
+            style={{
+              marginTop: 14,
+              width: "100%",
+              background: "rgba(255,255,255,0.013)",
+              border: "1px solid var(--border-color)",
+              borderRadius: 13,
+              boxShadow: "0 1.2px 9px #0ff1",
+              padding: "16px 17px 7px 19px"
+            }}
+          >
+            <div
+              style={{
+                fontWeight: 700,
+                fontSize: "1.047em",
+                color: "var(--secondary)",
+                marginBottom: 9,
+                letterSpacing: ".01em"
+              }}
+            >
+              Redaction Suggestions
+            </div>
+            <ul
+              style={{
+                margin: 0,
+                padding: 0,
+                listStyle: "none",
+                display: "flex",
+                flexWrap: "wrap",
+                gap: "13px 18px"
+              }}
+            >
+              {MOCK_ITEMS
+                .filter(i => i.redaction && i.redaction.length > 0)
+                .map(i =>
+                  i.redaction.map((phrase, idx) => (
+                    <li
+                      key={i.id + "-r" + idx}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        background: "#ff9edb09",
+                        border: "1.2px solid #ff9edb",
+                        color: "#ff9edb",
+                        borderRadius: 11,
+                        padding: "3px 11px",
+                        fontWeight: 600,
+                        fontSize: "0.98em",
+                        letterSpacing: ".007em",
+                        marginRight: 8
+                      }}
+                    >
+                      <span style={{
+                        fontWeight: 700,
+                        fontSize: "1.1em",
+                        color: "#fff",
+                        marginRight: 8
+                      }}>
+                        {itemTypeIcon(i.type)}
+                      </span>
+                      {phrase}
+                      <span style={{marginLeft: 7, color: "#ffc65f", fontSize: ".93em"}}>({i.label})</span>
+                    </li>
+                  ))
+                )
+              }
+              {MOCK_ITEMS.filter(i => i.redaction && i.redaction.length > 0).length === 0 && (
+                <li style={{
+                  color: "var(--text-secondary)", fontWeight: 500, opacity: 0.7
+                }}>
+                  No redactions suggested in current data.
+                </li>
+              )}
+            </ul>
+          </div>
         </div>
       </div>
-      <div style={{
-        marginTop: 17,
-        color: "var(--text-secondary)",
-        fontSize: "0.94em",
-        textAlign: "right",
-        paddingRight: 19,
-        letterSpacing: ".007em"
-      }}>
+      {/* Demo Footnote */}
+      <div
+        style={{
+          marginTop: 18,
+          color: "var(--text-secondary)",
+          fontSize: "0.94em",
+          textAlign: "right",
+          paddingRight: 19,
+          letterSpacing: ".007em"
+        }}
+      >
         Demo: All data and calculations are static/mocked.
       </div>
+      {/* Responsive adjustment for mobile: Stack the grid & adjust paddings */}
+      <style>{`
+        @media (max-width: 970px) {
+          .widget[aria-label="Data disintegration scheduler"] > div[style*="grid"] {
+            grid-template-columns: 1fr;
+            gap: 20px;
+            padding: 0 4vw;
+          }
+        }
+        @media (max-width: 650px) {
+          .widget[aria-label="Data disintegration scheduler"] {
+            padding: 0;
+          }
+          .widget[aria-label="Data disintegration scheduler"] > div[style*="grid"] > div {
+            min-width: 0 !important;
+            max-width: 100% !important;
+          }
+          .widget[aria-label="Data disintegration scheduler"] > div[style*="grid"] {
+            padding: 0 2vw !important;
+          }
+          .widget[aria-label="Data disintegration scheduler"] > div:last-child {
+            padding-right: 2vw;
+            font-size: 0.91em;
+          }
+        }
+      `}
+      </style>
     </div>
   );
 }
