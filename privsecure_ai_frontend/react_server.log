@@ -12,8 +12,8 @@ asset index.html 1.98 KiB [emitted]
 runtime modules 27.5 KiB 14 modules
 cacheable modules 1.35 MiB
   modules by path ./node_modules/ 1.24 MiB 31 modules
-  modules by path ./src/ 94.3 KiB
-    modules by path ./src/*.js 81.8 KiB 14 modules
+  modules by path ./src/ 94.9 KiB
+    modules by path ./src/*.js 82.4 KiB 14 modules
     modules by path ./src/*.css 12.5 KiB
       ./src/index.css 2.23 KiB [built] [code generated]
       + 3 modules
@@ -23,38 +23,34 @@ cacheable modules 1.35 MiB
       ./.ve/EditorOverlay.css 2.25 KiB [built] [code generated]
       ./node_modules/css-loader/dist/cjs.js!./.ve/EditorOverlay.css 697 bytes [built] [code generated]
     ./.ve/EditorOverlay.jsx 1.58 KiB [built] [code generated]
-webpack 5.99.9 compiled successfully in 1535 ms
+webpack 5.99.9 compiled successfully in 1549 ms
 assets by status 1.98 KiB [cached] 1 asset
-assets by path *.js 1.53 MiB
-  asset bundle.js 1.5 MiB [emitted] (name: main)
-  asset main.66bf59d2edb7606b6359.hot-update.js 28.4 KiB [emitted] [immutable] [hmr] (name: main)
-asset main.66bf59d2edb7606b6359.hot-update.json 28 bytes [emitted] [immutable] [hmr]
-Entrypoint main 1.53 MiB = bundle.js 1.5 MiB main.66bf59d2edb7606b6359.hot-update.js 28.4 KiB
+assets by path *.js 1.57 MiB
+  asset bundle.js 1.52 MiB [emitted] (name: main)
+  asset main.08721851cffdf4580725.hot-update.js 47.4 KiB [emitted] [immutable] [hmr] (name: main)
+asset main.08721851cffdf4580725.hot-update.json 28 bytes [emitted] [immutable] [hmr]
+Entrypoint main 1.57 MiB = bundle.js 1.52 MiB main.08721851cffdf4580725.hot-update.js 47.4 KiB
 cached modules 1.33 MiB [cached] 53 modules
 runtime modules 27.5 KiB 14 modules
-./src/AppRiskScanner.js 22.1 KiB [built] [code generated]
-webpack 5.99.9 compiled successfully in 177 ms
-assets by status 1.51 MiB [cached] 2 assets
-cached modules 1.33 MiB (javascript) 27.5 KiB (runtime) [cached] 67 modules
-./src/AppRiskScanner.js 22.1 KiB [built]
-webpack 5.99.9 compiled successfully in 114 ms
+./src/AppRiskScanner.js 37.5 KiB [built] [code generated]
+webpack 5.99.9 compiled successfully in 231 ms
 assets by status 1.98 KiB [cached] 1 asset
-assets by path *.js 1.53 MiB
-  asset bundle.js 1.5 MiB [emitted] (name: main)
-  asset main.727b594b351ad8d63315.hot-update.js 28.6 KiB [emitted] [immutable] [hmr] (name: main)
-asset main.727b594b351ad8d63315.hot-update.json 28 bytes [emitted] [immutable] [hmr]
-Entrypoint main 1.53 MiB = bundle.js 1.5 MiB main.727b594b351ad8d63315.hot-update.js 28.6 KiB
+assets by path *.js 1.57 MiB
+  asset bundle.js 1.52 MiB [emitted] (name: main)
+  asset main.7f524e07977c027a3ac8.hot-update.js 48.6 KiB [emitted] [immutable] [hmr] (name: main)
+asset main.7f524e07977c027a3ac8.hot-update.json 28 bytes [emitted] [immutable] [hmr]
+Entrypoint main 1.57 MiB = bundle.js 1.52 MiB main.7f524e07977c027a3ac8.hot-update.js 48.6 KiB
 cached modules 1.33 MiB [cached] 53 modules
 runtime modules 27.5 KiB 14 modules
-./src/AppRiskScanner.js 22.2 KiB [built] [code generated]
-webpack 5.99.9 compiled successfully in 89 ms
+./src/AppRiskScanner.js 38.6 KiB [built] [code generated]
+webpack 5.99.9 compiled successfully in 149 ms
 assets by status 1.98 KiB [cached] 1 asset
-assets by path *.js 1.53 MiB
-  asset bundle.js 1.5 MiB [emitted] (name: main)
-  asset main.5120b65ecb197dd6ec59.hot-update.js 28.6 KiB [emitted] [immutable] [hmr] (name: main)
-asset main.5120b65ecb197dd6ec59.hot-update.json 28 bytes [emitted] [immutable] [hmr]
-Entrypoint main 1.53 MiB = bundle.js 1.5 MiB main.5120b65ecb197dd6ec59.hot-update.js 28.6 KiB
+assets by path *.js 1.58 MiB
+  asset bundle.js 1.53 MiB [emitted] (name: main)
+  asset main.dd97dd0f6b3b3c4d0861.hot-update.js 52.3 KiB [emitted] [immutable] [hmr] (name: main)
+asset main.dd97dd0f6b3b3c4d0861.hot-update.json 28 bytes [emitted] [immutable] [hmr]
+Entrypoint main 1.58 MiB = bundle.js 1.53 MiB main.dd97dd0f6b3b3c4d0861.hot-update.js 52.3 KiB
 cached modules 1.33 MiB [cached] 53 modules
 runtime modules 27.5 KiB 14 modules
-./src/AppRiskScanner.js 22.2 KiB [built] [code generated]
-webpack 5.99.9 compiled successfully in 118 ms
+./src/AppRiskScanner.js 41.6 KiB [built] [code generated]
+webpack 5.99.9 compiled successfully in 119 ms

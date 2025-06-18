@@ -360,10 +360,393 @@ function AppRiskScanner() {
     setToast(t => ({ ...t, open: false, undoable: false }));
   }
 
-  // Handler for review and replace (unchanged, stub)
+  // Replacement Modal and Enhanced "Replace" Logic -----
+  const [replaceModal, setReplaceModal] = useState({
+    open: false,
+    appIdx: null,
+    app: null,
+  });
+  const [replaceStage, setReplaceStage] = useState("list"); // 'list' or 'details'
+  const [selectedAlt, setSelectedAlt] = useState(null);
+  const [isReplacing, setIsReplacing] = useState(false);
+  const [replaceResult, setReplaceResult] = useState({}); // {oldAppIdx: {newAppName, points, badge}}
+
+  // ---- Mock: Alt Privacy-Focused Apps ----
+  const ALTERNATIVE_APPS = [
+    {
+      name: "CryptPad",
+      icon: "🔒",
+      privacyScore: 97,
+      featureComparison: "End-to-end encrypted, no tracking. Live collaboration. Open source.",
+      links: {
+        web: "https://cryptpad.fr/",
+        install: "https://cryptpad.fr/",
+      },
+      badge: "Privacy Pioneer",
+      points: 60,
+      desc: "A full-featured, privacy-first office suite alternative with zero-knowledge encryption.",
+    },
+    {
+      name: "Standard Notes",
+      icon: "📝",
+      privacyScore: 95,
+      featureComparison: "Encrypted notes. No ads. Minimal user tracking.",
+      links: {
+        web: "https://standardnotes.com/",
+        install: "https://standardnotes.com/downloads",
+      },
+      badge: "Encryption Expert",
+      points: 40,
+      desc: "Notes app that protects your data with strong encryption and no analytics.",
+    },
+    {
+      name: "Signal",
+      icon: "📱",
+      privacyScore: 98,
+      featureComparison: "Secure messaging, verified open-source, no data mining.",
+      links: {
+        web: "https://signal.org/",
+        install: "https://signal.org/download/",
+      },
+      badge: "Signal Champion",
+      points: 35,
+      desc: "Messaging and calls app renowned for its uncompromised privacy.",
+    },
+    {
+      name: "Proton Drive",
+      icon: "🚀",
+      privacyScore: 95,
+      featureComparison: "End-to-end encrypted file storage by Proton.",
+      links: { web: "https://proton.me/drive", install: "https://proton.me/drive" },
+      badge: "Zero Knowledge",
+      points: 45,
+      desc: "Cloud storage with strict privacy, Swiss-based & GDPR compliant.",
+    },
+  ];
+
+  // Handler: Open replace modal for this app
+  function handleReplaceClick(app, idx) {
+    setReplaceModal({ open: true, appIdx: idx, app });
+    setReplaceStage("list");
+    setSelectedAlt(null);
+  }
+
+  // Handler: User selects replacement app to view details
+  function handleAltClick(altApp) {
+    setSelectedAlt(altApp);
+    setReplaceStage("details");
+  }
+
+  // Handler: Close modal
+  function handleCloseReplaceModal() {
+    setReplaceModal({ open: false, appIdx: null, app: null });
+    setReplaceStage("list");
+    setSelectedAlt(null);
+    setIsReplacing(false);
+  }
+
+  // Handler: Install alternative app only (simulate API)
+  function handleInstallAlternative() {
+    setIsReplacing(true);
+    setTimeout(() => {
+      setIsReplacing(false);
+      setReplaceResult((res) => ({
+        ...res,
+        [replaceModal.appIdx]: {
+          ...res[replaceModal.appIdx],
+          newAppName: selectedAlt.name,
+          points: selectedAlt.points,
+          badge: selectedAlt.badge,
+          action: "install",
+        },
+      }));
+      setToast({
+        open: true,
+        msg: (
+          <>
+            <span>Installed <b>{selectedAlt.name}</b> (<span style={{ color: "#0ff" }}>+{selectedAlt.points} pts</span>)!</span>
+            <span style={{ marginLeft: 9, color: "var(--primary)" }}>
+              <b>Badge:</b> <span style={{ color: "#ff9edb" }}>{selectedAlt.badge}</span>
+            </span>
+          </>
+        ),
+        undoable: false,
+        appIdx: null,
+      });
+      handleCloseReplaceModal();
+    }, 900);
+  }
+
+  // Handler: Revoke old app and install alternative
+  function handleRevokeAndInstallAlt() {
+    setIsReplacing(true);
+    setTimeout(() => {
+      // Mark the app as replaced (grey), mark new app, show notification with badge/points etc
+      setApps((apps) =>
+        apps.map((app, i) =>
+          i === replaceModal.appIdx
+            ? { ...app, revoked: true, replacedBy: selectedAlt.name }
+            : app
+        )
+      );
+      setIsReplacing(false);
+      setReplaceResult((res) => ({
+        ...res,
+        [replaceModal.appIdx]: {
+          newAppName: selectedAlt.name,
+          points: selectedAlt.points,
+          badge: selectedAlt.badge,
+          action: "replace",
+        },
+      }));
+      setToast({
+        open: true,
+        msg: (
+          <>
+            <span>
+              <b>Replaced</b> <span style={{ color: "#ffc65f" }}>{replaceModal.app.name}</span>
+              &nbsp;with <b>{selectedAlt.name}</b>!
+            </span>
+            <span
+              style={{
+                marginLeft: 5,
+                color: "#0ff",
+                fontWeight: 700,
+              }}
+            >
+              +{selectedAlt.points} pts
+            </span>
+            <span
+              style={{
+                color: "#ff9edb",
+                marginLeft: 8,
+                fontWeight: 700,
+              }}
+            >
+              🏅 {selectedAlt.badge}
+            </span>
+          </>
+        ),
+        undoable: false,
+        appIdx: replaceModal.appIdx,
+      });
+      handleCloseReplaceModal();
+    }, 1050);
+  }
+
+  // Handler for review (still stub)
   function handleAction(action, appName) {
     window.alert(`${action} action for "${appName}" – (This is mock UI)`);
   }
+
+  // Helper: Render Alternative Apps List
+  function AltAppsList({ onSelect }) {
+    return (
+      <div>
+        <div style={{ fontWeight: 700, marginBottom: 9, color: "var(--primary)" }}>
+          Privacy-Focused Alternatives
+        </div>
+        <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
+          {ALTERNATIVE_APPS.map((alt) => (
+            <li
+              key={alt.name}
+              style={{
+                margin: "0 0 13px 0",
+                background: "rgba(255,255,255,0.05)",
+                border: "1.3px solid var(--border-color)",
+                borderRadius: 13,
+                boxShadow: "0 0.8px 5px rgba(0,255,255,0.08)",
+                padding: "13px 17px",
+                display: "flex",
+                alignItems: "center",
+                cursor: "pointer",
+                transition: "background 0.18s",
+                gap: 13,
+              }}
+              tabIndex={0}
+              onClick={() => onSelect(alt)}
+              onKeyPress={(e) => {
+                if (e.key === "Enter") onSelect(alt);
+              }}
+              aria-label={`Select privacy app ${alt.name}`}
+            >
+              <span
+                style={{
+                  fontSize: "1.8em",
+                  marginRight: 12,
+                  verticalAlign: "middle",
+                }}
+                aria-hidden
+              >
+                {alt.icon}
+              </span>
+              <span>
+                <div style={{ fontWeight: 700, color: "var(--primary)" }}>
+                  {alt.name}
+                  <span
+                    style={{
+                      fontWeight: 600,
+                      color: "#11f2cb",
+                      marginLeft: 11,
+                      background: "#093a43",
+                      borderRadius: 8,
+                      fontSize: ".94em",
+                      padding: "2px 9px",
+                      border: "1.11px solid #12eee6",
+                    }}
+                  >
+                    {alt.privacyScore} Privacy
+                  </span>
+                </div>
+                <div
+                  style={{
+                    fontWeight: 500,
+                    fontSize: ".94em",
+                    color: "var(--text-secondary)",
+                  }}
+                >
+                  {alt.featureComparison}
+                </div>
+                <div style={{ color: "#ffdbee", fontWeight: 600, fontSize: ".95em", marginTop: 3 }}>
+                  {alt.badge ? `🏅 ${alt.badge} +${alt.points} pts` : ""}
+                </div>
+              </span>
+              <span
+                style={{
+                  marginLeft: "auto",
+                  color: "#0ff",
+                  fontWeight: 700,
+                  fontSize: "1.03em",
+                  letterSpacing: ".13em",
+                }}
+                aria-hidden
+              >
+                &rarr;
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  }
+
+  // Helper: Alt App Details/Install View
+  function AltAppDetails({ altApp, onBack, installDisabled, isLoading, onInstall, onReplaceInstall }) {
+    return (
+      <div>
+        <button
+          style={{
+            background: "none",
+            border: "none",
+            color: "#0ff",
+            fontWeight: 700,
+            marginBottom: 4,
+            cursor: isLoading ? "not-allowed" : "pointer",
+          }}
+          onClick={onBack}
+          disabled={isLoading}
+        >
+          &larr; Back to alternatives
+        </button>
+        <div style={{ display: "flex", gap: 14, alignItems: "center", marginBottom: 6 }}>
+          <span style={{ fontSize: "2.2em" }}>{altApp.icon}</span>
+          <span style={{ fontSize: "1.16em", fontWeight: 800, color: "var(--primary)" }}>
+            {altApp.name}
+          </span>
+          <span style={{
+            marginLeft: 15,
+            fontWeight: 700,
+            color: "#0ff",
+            background: "#0ff3",
+            borderRadius: 9,
+            fontSize: ".99em",
+            padding: "3px 13px",
+            border: "1.13px solid #12eee6"
+          }}>{altApp.privacyScore} Privacy</span>
+        </div>
+        <div
+          style={{
+            color: "var(--text-secondary)",
+            fontWeight: 500,
+            marginBottom: 8,
+            fontSize: ".97em",
+          }}
+        >
+          {altApp.desc}
+        </div>
+        <div
+          style={{
+            color: "#ffccee",
+            fontWeight: 600,
+            fontSize: ".96em",
+            marginBottom: 10,
+          }}
+        >
+          <span style={{ color: "#ffffa0" }}>{altApp.featureComparison}</span>
+        </div>
+        <div style={{ marginBottom: 7 }}>
+          <a
+            href={altApp.links.web}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              color: "#0ff",
+              textDecoration: "underline",
+              marginRight: 19,
+              fontWeight: 700,
+              fontSize: ".98em",
+            }}
+          >
+            View More
+          </a>
+          <a
+            href={altApp.links.install}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              color: "#ff9edb",
+              textDecoration: "underline",
+              fontWeight: 700,
+              fontSize: ".98em",
+            }}
+          >
+            Download / Integrate
+          </a>
+        </div>
+        <div
+          style={{
+            margin: "13px 0 13px 0",
+            color: "#e5fff4",
+            fontWeight: 600,
+            fontSize: "1.03em",
+          }}
+        >
+          {altApp.badge && (
+            <>
+              <span role="img" aria-label="badge">🏅</span> Earn the <span style={{ color: "#0ff", fontWeight: 700 }}>
+                {altApp.badge}</span> badge (+{altApp.points} pts) when you install and replace!
+            </>
+          )}
+        </div>
+        <div style={{ display: "flex", gap: 9, marginTop: 6 }}>
+          <ActionButton
+            label={isLoading ? "Installing..." : "Install New App"}
+            color="var(--primary)"
+            onClick={onInstall}
+            disabled={isLoading || installDisabled}
+          />
+          <ActionButton
+            label={isLoading ? "Replacing..." : "Replace & Install"}
+            color="#ffc65f"
+            onClick={onReplaceInstall}
+            disabled={isLoading || installDisabled}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // --- Privacy score: dynamically calculate from non-revoked apps (not changed)
 
   // Privacy score: dynamically calculate from non-revoked apps
   const privacyScore = (() => {
@@ -458,94 +841,114 @@ function AppRiskScanner() {
             </tr>
           </thead>
           <tbody>
-            {apps.map((app, idx) => (
-              <tr
-                key={app.name}
-                style={{
-                  background: idx % 2 === 0 ? "rgba(0,255,255,0.015)" : "rgba(255, 158, 219, .015)",
-                  borderRadius: 15,
-                  boxShadow: idx === 0 ? "0 2px 6px 0 #0002" : "none",
-                  transition: "background 0.19s",
-                  borderBottom: "1.1px solid var(--border-color)",
-                  opacity: app.revoked ? 0.46 : 1,
-                  filter: app.revoked ? "grayscale(0.82) blur(0.13px)" : "",
-                  pointerEvents: app.revoked ? "none" : "auto"
-                }}
-              >
-                <td style={{
-                  padding: "12px 9px 12px 17px",
-                  fontWeight: 600,
-                  color: "var(--primary)",
-                  fontSize: "1.04em",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 10
-                }}>
-                  <span style={{
-                    fontSize: "1.35em",
-                    marginRight: 7,
-                    verticalAlign: "middle"
-                  }}>{app.icon}</span>
-                  <span>
-                    <div style={{ fontWeight: 700 }}>{app.name}</div>
-                    <div style={{
-                      color: "var(--secondary)",
-                      fontWeight: 500,
-                      fontSize: ".97em",
-                      letterSpacing: ".005em"
-                    }}>{app.platform}</div>
-                  </span>
-                </td>
-                <td style={{ padding: "11px 8px" }}>
-                  {permissionChip(app.permission)}
-                </td>
-                <td style={{ padding: "11px 8px" }}>
-                  {trustBadge(app.trustScore)}
-                </td>
-                <td style={{ padding: "11px 8px", fontWeight: 500, color: "#aef" }}>
-                  {app.lastUsed}
-                </td>
-                <td style={{ padding: "11px 5px" }}>
-                  <ActionButton
-                    label="Review"
-                    color="var(--secondary)"
-                    onClick={() => handleAction("Review", app.name)}
-                    disabled={app.revoked}
-                  />
-                  <ActionButton
-                    label={app.revoked ? "Revoked" : "Revoke"}
-                    color="var(--accent)"
-                    onClick={() => handleRevokeClick(app, idx)}
-                    disabled={app.revoked}
-                  />
-                  <ActionButton
-                    label="Replace with safer app"
-                    color="#ffc65f"
-                    onClick={() => handleAction("Replace", app.name)}
-                    disabled={app.revoked}
-                  />
-                  {app.revoked && (
-                    <span
-                      style={{
-                        marginLeft: 9,
-                        color: "#f7f7f6",
-                        background: "#282e47",
-                        borderRadius: 9,
-                        fontWeight: 700,
+            {apps.map((app, idx) => {
+              const replaced = !!replaceResult[idx] && replaceResult[idx].action === "replace";
+              const newAppName = replaced ? replaceResult[idx].newAppName : "";
+              return (
+                <tr
+                  key={app.name}
+                  style={{
+                    background: idx % 2 === 0 ? "rgba(0,255,255,0.015)" : "rgba(255, 158, 219, .015)",
+                    borderRadius: 15,
+                    boxShadow: idx === 0 ? "0 2px 6px 0 #0002" : "none",
+                    transition: "background 0.19s",
+                    borderBottom: "1.1px solid var(--border-color)",
+                    opacity: app.revoked || replaced ? 0.45 : 1,
+                    filter: app.revoked || replaced ? "grayscale(0.92) blur(0.09px)" : "",
+                    pointerEvents: app.revoked || replaced ? "none" : "auto",
+                  }}
+                >
+                  <td style={{
+                    padding: "12px 9px 12px 17px",
+                    fontWeight: 600,
+                    color: "var(--primary)",
+                    fontSize: "1.04em",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 10
+                  }}>
+                    <span style={{
+                      fontSize: "1.35em",
+                      marginRight: 7,
+                      verticalAlign: "middle"
+                    }}>{app.icon}</span>
+                    <span>
+                      <div style={{ fontWeight: 700 }}>{app.name}</div>
+                      <div style={{
+                        color: "var(--secondary)",
+                        fontWeight: 500,
                         fontSize: ".97em",
-                        padding: "2px 13px",
-                        letterSpacing: ".019em",
-                        border: "1.15px solid #12fff4",
-                        filter: "none",
-                        opacity: 0.92,
-                      }}
-                    >
-                      Revoked
+                        letterSpacing: ".005em"
+                      }}>{app.platform}</div>
                     </span>
-                  )}
-                </td>
-              </tr>
-            ))}
+                  </td>
+                  <td style={{ padding: "11px 8px" }}>
+                    {permissionChip(app.permission)}
+                  </td>
+                  <td style={{ padding: "11px 8px" }}>
+                    {trustBadge(app.trustScore)}
+                  </td>
+                  <td style={{ padding: "11px 8px", fontWeight: 500, color: "#aef" }}>
+                    {app.lastUsed}
+                  </td>
+                  <td style={{ padding: "11px 5px" }}>
+                    <ActionButton
+                      label="Review"
+                      color="var(--secondary)"
+                      onClick={() => handleAction("Review", app.name)}
+                      disabled={app.revoked || replaced}
+                    />
+                    <ActionButton
+                      label={app.revoked ? "Revoked" : replaced ? "Replaced" : "Revoke"}
+                      color="var(--accent)"
+                      onClick={() => handleRevokeClick(app, idx)}
+                      disabled={app.revoked || replaced}
+                    />
+                    <ActionButton
+                      label={
+                        replaced
+                          ? "Replaced"
+                          : "Replace with safer app"
+                      }
+                      color="#ffc65f"
+                      onClick={() => handleReplaceClick(app, idx)}
+                      disabled={app.revoked || replaced}
+                    />
+                    {(app.revoked || replaced) && (
+                      <span
+                        style={{
+                          marginLeft: 9,
+                          color: "#f7f7f6",
+                          background: replaced ? "#282e47" : "#282e47",
+                          borderRadius: 9,
+                          fontWeight: 700,
+                          fontSize: ".97em",
+                          padding: "2px 13px",
+                          letterSpacing: ".019em",
+                          border: replaced
+                            ? "1.3px solid #ffc65f"
+                            : "1.15px solid #12fff4",
+                          filter: "none",
+                          opacity: 0.98,
+                        }}
+                      >
+                        {replaced ? (
+                          <>
+                            Replaced by&nbsp;
+                            <span style={{
+                              fontWeight: 700,
+                              color: "#ffc65f"
+                            }}>{newAppName}</span>
+                          </>
+                        ) : (
+                          "Revoked"
+                        )}
+                      </span>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
         {/* If no non-revoked apps */}
@@ -573,6 +976,83 @@ function AppRiskScanner() {
         app={pendingRevokeApp}
         loading={isRevoking}
       />
+      {/* --- Replace Modal (Portal-like) --- */}
+      {replaceModal.open && (
+        <div
+          style={{
+            position: "fixed",
+            left: 0,
+            top: 0,
+            width: "100vw",
+            height: "100vh",
+            zIndex: 130,
+            background: "rgba(0,35,60,0.36)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center"
+          }}
+          tabIndex={-1}
+          aria-modal="true"
+          role="dialog"
+        >
+          <div
+            style={{
+              background: "rgba(18,25,36,0.97)",
+              borderRadius: 17,
+              border: "2px solid var(--primary)",
+              boxShadow: "0 10px 48px #000d",
+              minWidth: 370,
+              maxWidth: "95vw",
+              color: "#fff",
+              outline: "none",
+              padding: "35px 31px 29px 29px",
+              maxHeight: "92vh",
+              overflowY: "auto",
+              position: "relative"
+            }}
+          >
+            <button
+              style={{
+                position: "absolute",
+                top: 9,
+                right: 11,
+                zIndex: 2,
+                background: "none",
+                border: "none",
+                color: "#ff9edb",
+                fontWeight: 700,
+                fontSize: "1.25em",
+                cursor: isReplacing ? "not-allowed" : "pointer",
+                borderRadius: 7,
+              }}
+              aria-label="Close"
+              onClick={handleCloseReplaceModal}
+              disabled={isReplacing}
+            >
+              ×
+            </button>
+            <div style={{ fontWeight: 800, fontSize: "1.17em", color: "var(--primary)", marginBottom: 4, textShadow: "0 0 9px #0ff6" }}>
+              Replace App: <span style={{ color: "#ffc65f" }}>{replaceModal.app?.name}</span>
+            </div>
+            <div style={{ fontWeight: 500, color: "var(--text-secondary)", marginBottom: 10 }}>
+              Choose a privacy-respecting alternative for better security—and earn rewards!
+            </div>
+            {replaceStage === "list" && (
+              <AltAppsList onSelect={handleAltClick} />
+            )}
+            {replaceStage === "details" && selectedAlt && (
+              <AltAppDetails
+                altApp={selectedAlt}
+                onBack={() => { setReplaceStage("list"); setSelectedAlt(null); }}
+                installDisabled={isReplacing}
+                isLoading={isReplacing}
+                onInstall={handleInstallAlternative}
+                onReplaceInstall={handleRevokeAndInstallAlt}
+              />
+            )}
+          </div>
+        </div>
+      )}
       <ToastNotification
         open={toast.open}
         msg={toast.msg}
