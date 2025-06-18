@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 
 /**
  * Mock data for connected third-party apps/platforms
  */
-const MOCK_APPS = [
+const MOCK_APPS_INIT = [
   {
     name: "Google Drive",
     platform: "Google",
@@ -119,7 +119,7 @@ function permissionChip(permission) {
 }
 
 // Helper: Themed action buttons
-function ActionButton({ label, color, onClick }) {
+function ActionButton({ label, color, onClick, disabled }) {
   return (
     <button
       className="btn"
@@ -134,26 +134,243 @@ function ActionButton({ label, color, onClick }) {
         fontSize: "0.98em",
         padding: "7px 14px",
         boxShadow: "0 1.2px 7px 0 #0003",
-        opacity: 1,
-        cursor: "pointer",
+        opacity: disabled ? 0.4 : 1,
+        cursor: disabled ? "not-allowed" : "pointer",
         transition: "background 0.2s, color 0.2s",
       }}
       tabIndex={0}
       type="button"
       aria-label={label}
       onClick={onClick}
+      disabled={disabled}
     >
       {label}
     </button>
   );
 }
 
+// Small dialog modal for confirm (not using an external library)
+function ConfirmDialog({
+  open,
+  onClose,
+  onConfirm,
+  app,
+  loading,
+}) {
+  if (!open || !app) return null;
+  return (
+    <div
+      style={{
+        position: "fixed",
+        left: 0, top: 0, width: "100vw", height: "100vh",
+        zIndex: 50,
+        background: "rgba(0,16,48,0.28)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center"
+      }}
+    >
+      <div
+        role="dialog"
+        aria-modal="true"
+        tabIndex={-1}
+        style={{
+          minWidth: 340,
+          background: "rgba(0,10,36,0.94)",
+          borderRadius: 14,
+          border: "1.8px solid var(--accent)",
+          boxShadow: "0 8px 43px #000b",
+          padding: "30px 23px 19px 23px",
+          maxWidth: "94vw",
+          color: "#fff",
+          outline: "none"
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <span style={{ fontSize: "2.4em" }}>{app.icon || "⚠️"}</span>
+          <span style={{ fontSize: "1.19em", fontWeight: 700, color: "var(--accent)" }}>Revoke App: <span style={{ color: "var(--primary)" }}>{app.name}</span></span>
+        </div>
+        <div style={{ margin: "18px 0 13px 0", fontWeight: 500, color: "var(--text-secondary)" }}>
+          Are you sure you want to revoke access for <b>{app.name}</b>?<br/>
+          The following permissions will be lost:
+          <ul style={{ margin: "7px 0 0 18px", padding: 0 }}>
+            <li>
+              <span>{permissionChip(app.permission)}</span>
+              <span style={{ marginLeft: 7, color: "var(--secondary)", fontWeight: 600 }}>
+                ({app.permission === "Full Access"
+                  ? "Can read, modify, and delete your data"
+                  : app.permission === "Read/Write"
+                  ? "Can read and change most account data"
+                  : "Limited: Only profile details"})</span>
+            </li>
+          </ul>
+        </div>
+        <div style={{ fontSize: ".97em", color: "#ffb2e5", marginBottom: 16 }}>
+          This action can't be undone unless you actively reconnect the app.
+        </div>
+        <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
+          <ActionButton
+            label="Cancel"
+            color="var(--secondary)"
+            onClick={onClose}
+            disabled={loading}
+          />
+          <ActionButton
+            label={loading ? "Revoking..." : "Confirm Revoke"}
+            color="var(--accent)"
+            onClick={onConfirm}
+            disabled={loading}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Toast/notification for "revoked" with undo
+function ToastNotification({ open, msg, undoLabel, onUndo, timeout = 4800 }) {
+  const [visible, setVisible] = useState(open);
+
+  React.useEffect(() => {
+    if (open) {
+      setVisible(true);
+      const timer = setTimeout(() => setVisible(false), timeout);
+      return () => clearTimeout(timer);
+    }
+  }, [open, timeout]);
+
+  if (!visible) return null;
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        bottom: 29, right: 29,
+        zIndex: 90,
+        background: "rgba(14,40,44,0.96)",
+        borderRadius: 14,
+        border: "1.6px solid var(--accent)",
+        boxShadow: "0 3px 38px #00ffd59c",
+        minWidth: 230,
+        maxWidth: 389,
+        padding: "14px 23px 12px 21px",
+        color: "#fff",
+        fontWeight: 500,
+        opacity: visible ? 1 : 0,
+        transition: "opacity 0.23s"
+      }}
+      aria-live="assertive"
+      tabIndex={-1}
+    >
+      <span style={{ marginRight: 19 }}>{msg}</span>
+      {!!onUndo && (
+        <button
+          onClick={onUndo}
+          style={{
+            background: "none",
+            border: "none",
+            fontWeight: 700,
+            color: "#55feff",
+            marginLeft: 7,
+            textDecoration: "underline",
+            cursor: "pointer",
+            fontSize: "1em"
+          }}
+        >
+          {undoLabel || "Undo"}
+        </button>
+      )}
+    </div>
+  );
+}
+
 // PUBLIC_INTERFACE
 function AppRiskScanner() {
-  // Handler: For now, mock with alerts only (could expand with modals/flows)
+  // Enhanced stateful app list to allow UI updates on revoke/undo
+  const [apps, setApps] = useState(
+    MOCK_APPS_INIT.map((a) => ({ ...a, revoked: false }))
+  );
+  // State for confirmation dialog
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [pendingRevokeApp, setPendingRevokeApp] = useState(null);
+  const [isRevoking, setIsRevoking] = useState(false);
+
+  // Toast notification state
+  const [toast, setToast] = useState({
+    open: false,
+    msg: "",
+    appIdx: null,
+    undoable: false,
+  });
+
+  // Handler: Enhanced action for "Revoke" with confirmation
+  function handleRevokeClick(app, idx) {
+    setPendingRevokeApp({ ...app, idx });
+    setDialogOpen(true);
+  }
+
+  // Handler: Confirm user wants to revoke
+  function handleRevokeConfirm() {
+    if (!pendingRevokeApp) return;
+    setIsRevoking(true);
+    // Simulate an API call to OAuth revoke endpoint (delay for realism)
+    setTimeout(() => {
+      setApps((apps) =>
+        apps.map((app, i) =>
+          i === pendingRevokeApp.idx
+            ? { ...app, revoked: true }
+            : app
+        )
+      );
+      setDialogOpen(false);
+      setIsRevoking(false);
+      setToast({
+        open: true,
+        msg: `Access revoked for "${pendingRevokeApp.name}". Privacy risk reduced.`,
+        appIdx: pendingRevokeApp.idx,
+        undoable: true,
+      });
+      setPendingRevokeApp(null);
+    }, 940); // simulate network latency
+  }
+
+  // Handler: Undo revoke
+  function handleUndoRevoke() {
+    if (toast.appIdx == null) return;
+    setApps((apps) =>
+      apps.map((app, i) =>
+        i === toast.appIdx
+          ? { ...app, revoked: false }
+          : app
+      )
+    );
+    setToast({ open: false, msg: "", appIdx: null, undoable: false });
+  }
+
+  // Hide toast after finish
+  function handleToastClose() {
+    setToast(t => ({ ...t, open: false, undoable: false }));
+  }
+
+  // Handler for review and replace (unchanged, stub)
   function handleAction(action, appName) {
     window.alert(`${action} action for "${appName}" – (This is mock UI)`);
   }
+
+  // Privacy score: dynamically calculate from non-revoked apps
+  const privacyScore = (() => {
+    // Simple model: average trust score, 15% bonus for each revoked, but won't exceed 100.
+    const nonRevoked = apps.filter((a) => !a.revoked);
+    let score = nonRevoked.length
+      ? Math.round(
+          nonRevoked.reduce((acc, a) => acc + a.trustScore, 0) /
+            nonRevoked.length
+        )
+      : 100; // all revoked = perfect privacy
+    const revokedCount = apps.filter((a) => a.revoked).length;
+    score = Math.min(100, Math.round(score + revokedCount * 9.5));
+    return score;
+  })();
 
   return (
     <div
@@ -194,7 +411,13 @@ function AppRiskScanner() {
           padding: "0 23px 9px 23px",
         }}
       >
-        Review permissions, trust scores, and last usage of apps/platforms connected to your account. Take action to revoke or replace unsafe integrations.
+        Review permissions, trust scores, last usage of apps connected to your account.
+        Take action to revoke unsafe integrations.
+        <span style={{ marginLeft: 19, color: "var(--accent)", fontWeight: 700, float: "right", fontSize: ".99em" }}>
+          Privacy Score: <span style={{
+           color: "#12fff6", textShadow: "0 0 8px #0ff5", fontWeight: 800, fontSize: "1.09em"
+          }}>{privacyScore}</span>
+        </span>
       </div>
       {/* Table-like List */}
       <div
@@ -227,7 +450,7 @@ function AppRiskScanner() {
             </tr>
           </thead>
           <tbody>
-            {MOCK_APPS.map((app, idx) => (
+            {apps.map((app, idx) => (
               <tr
                 key={app.name}
                 style={{
@@ -236,6 +459,9 @@ function AppRiskScanner() {
                   boxShadow: idx === 0 ? "0 2px 6px 0 #0002" : "none",
                   transition: "background 0.19s",
                   borderBottom: "1.1px solid var(--border-color)",
+                  opacity: app.revoked ? 0.46 : 1,
+                  filter: app.revoked ? "grayscale(0.82) blur(0.13px)" : "",
+                  pointerEvents: app.revoked ? "none" : "auto"
                 }}
               >
                 <td style={{
@@ -268,30 +494,54 @@ function AppRiskScanner() {
                 <td style={{ padding: "11px 8px" }}>
                   {trustBadge(app.trustScore)}
                 </td>
-                <td style={{ padding: "11px 8px", fontWeight: 500, color: "#aef" }}>{app.lastUsed}</td>
+                <td style={{ padding: "11px 8px", fontWeight: 500, color: "#aef" }}>
+                  {app.lastUsed}
+                </td>
                 <td style={{ padding: "11px 5px" }}>
                   <ActionButton
                     label="Review"
                     color="var(--secondary)"
                     onClick={() => handleAction("Review", app.name)}
+                    disabled={app.revoked}
                   />
                   <ActionButton
-                    label="Revoke"
+                    label={app.revoked ? "Revoked" : "Revoke"}
                     color="var(--accent)"
-                    onClick={() => handleAction("Revoke", app.name)}
+                    onClick={() => handleRevokeClick(app, idx)}
+                    disabled={app.revoked}
                   />
                   <ActionButton
                     label="Replace with safer app"
                     color="#ffc65f"
                     onClick={() => handleAction("Replace", app.name)}
+                    disabled={app.revoked}
                   />
+                  {app.revoked && (
+                    <span
+                      style={{
+                        marginLeft: 9,
+                        color: "#f7f7f6",
+                        background: "#282e47",
+                        borderRadius: 9,
+                        fontWeight: 700,
+                        fontSize: ".97em",
+                        padding: "2px 13px",
+                        letterSpacing: ".019em",
+                        border: "1.15px solid #12fff4",
+                        filter: "none",
+                        opacity: 0.92,
+                      }}
+                    >
+                      Revoked
+                    </span>
+                  )}
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
-        {/* If no apps */}
-        {MOCK_APPS.length === 0 && (
+        {/* If no non-revoked apps */}
+        {apps.length === 0 && (
           <div
             style={{
               textAlign: "center",
@@ -305,6 +555,23 @@ function AppRiskScanner() {
           </div>
         )}
       </div>
+      <ConfirmDialog
+        open={dialogOpen}
+        onClose={() => {
+          setDialogOpen(false);
+          setPendingRevokeApp(null);
+        }}
+        onConfirm={handleRevokeConfirm}
+        app={pendingRevokeApp}
+        loading={isRevoking}
+      />
+      <ToastNotification
+        open={toast.open}
+        msg={toast.msg}
+        undoLabel={toast.undoable ? "Undo" : undefined}
+        onUndo={toast.undoable ? handleUndoRevoke : undefined}
+        timeout={4500}
+      />
     </div>
   );
 }
