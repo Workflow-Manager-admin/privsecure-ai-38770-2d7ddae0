@@ -23,7 +23,8 @@ function Sidebar({ onNavigate, activePage }) {
     { id: "scheduler", label: "Scheduler" },
     { id: "badges", label: "Badges" },
     { id: "manifesto", label: "Manifesto" },
-    { id: "settings", label: "Settings" }
+    { id: "settings", label: "Settings" },
+    { id: "about", label: "About" }
   ];
 
   // Handle window resize for collapsed state

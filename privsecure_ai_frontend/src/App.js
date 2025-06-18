@@ -11,6 +11,7 @@ import DataDisintegrationScheduler from './DataDisintegrationScheduler';
 import PrivacyBadgeSystem from './PrivacyBadgeSystem';
 import PrivacyManifestoGenerator from './PrivacyManifestoGenerator';
 import SettingsReportsSection from './SettingsReportsSection';
+import AboutPage from './AboutPage';
 import Sidebar from './Sidebar';
 import { ThemeProvider } from './ThemeContext';
 
@@ -30,7 +31,8 @@ function App() {
     scheduler: <DataDisintegrationScheduler />,
     badges: <PrivacyBadgeSystem />,
     manifesto: <PrivacyManifestoGenerator />,
-    settings: <SettingsReportsSection />
+    settings: <SettingsReportsSection />,
+    about: <AboutPage />
   };
 
   // Handler for sidebar navigation.
